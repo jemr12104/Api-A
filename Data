@@ -1,0 +1,39 @@
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# Datos de ejemplo
+usuarios = [
+    {"id": 1, "nombre": "Jefferson"},
+    {"id": 2, "nombre": "Eduardo"},
+    {"id": 3, "nombre": "Heydi"}
+]
+
+# Ruta para obtener todos los usuarios
+@app.route('/api/usuarios', methods=['GET'])
+def obtener_usuarios():
+    return jsonify({"usuarios": usuarios})
+
+# Ruta para obtener un usuario por ID
+@app.route('/api/usuarios/<int:id>', methods=['GET'])
+def obtener_usuario(id):
+    usuario = next((usuario for usuario in usuarios if usuario["id"] == id), None)
+    if usuario:
+        return jsonify({"usuario": usuario})
+    else:
+        return jsonify({"mensaje": "Usuario no encontrado"}), 404
+
+# Ruta para agregar un nuevo usuario
+@app.route('/api/usuarios', methods=['POST'])
+def agregar_usuario():
+    data = request.get_json()
+    nuevo_usuario = {
+        "id": len(usuarios) + 1,
+        "nombre": data["nombre"]
+    }
+    usuarios.append(nuevo_usuario)
+    return jsonify({"mensaje": "Usuario agregado exitosamente", "usuario": nuevo_usuario}), 201
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
